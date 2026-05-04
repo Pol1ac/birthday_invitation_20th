@@ -43,7 +43,7 @@ function ensureFonts() {
 // To collect real RSVPs:
 //  1. Go to https://tally.so and create a free form with these fields:
 //       - "Імʼя" (short text, field name = name)
-//       - "Чи будеш?" (single choice: "буду" / "не зможу", field name = status)
+//       - "Чи ��удеш?" (single choice: "буду" / "не зможу", field name = status)
 //       - (optional) "Повідомлення" (long text, field name = message)
 //  2. Click "Publish", copy the form URL — it will look like https://tally.so/r/abc123
 //  3. Paste it below as TALLY_URL.
@@ -973,7 +973,7 @@ function DresscodeScreen() {
         >
           {[
             { y: "✓", t: "шорти / лляне", k: "так" },
-            { y: "✓", t: "сорочки в квіти", k: "так" },
+            { y: "✓", t: "гавайська сорочка", k: "так" },
             { y: "✓", t: "сонцезахисні окуляри", k: "так" },
             { y: "✓", t: "сандалі / босоніж", k: "так" },
             { y: "✗", t: "костюм-трійка", k: "ну ні" },
@@ -1397,11 +1397,15 @@ function RsvpScreen({ onSubmit, status }) {
         status: choice === "yes" ? "буду" : "не зможу",
       }).toString();
       const sep = TALLY_URL.includes("?") ? "&" : "?";
-      try {
-        window.open(TALLY_URL + sep + params, "_blank", "noopener,noreferrer");
-      } catch (e) {
-        // ignore — still show the local confirmation below
-      }
+      const url = TALLY_URL + sep + params;
+      // Create a temporary link and click it - more reliable than window.open
+      const link = document.createElement("a");
+      link.href = url;
+      link.target = "_blank";
+      link.rel = "noopener noreferrer";
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
     }
     onSubmit(choice, name || "ти");
   };
@@ -1776,40 +1780,26 @@ export default function Invitation() {
         
         /* === RESPONSIVE STYLES === */
         .paper-card {
-          max-width: 420px;
+          width: 100%;
+          max-width: 100%;
           margin: 0 auto;
-          padding: 32px 24px;
         }
         
-        @media (max-width: 480px) {
+        @media (min-width: 600px) {
           .paper-card {
-            max-width: 100%;
-            padding: 24px 16px;
-            border-radius: 0 !important;
-            border-left: none !important;
-            border-right: none !important;
-          }
-          h1 { font-size: 2.5rem !important; }
-          h2 { font-size: 2rem !important; }
-        }
-        
-        @media (min-width: 481px) and (max-width: 768px) {
-          .paper-card {
-            max-width: 90%;
-            padding: 28px 20px;
+            max-width: 540px;
           }
         }
         
-        @media (min-width: 769px) {
+        @media (min-width: 900px) {
           .paper-card {
-            max-width: 460px;
-            padding: 40px 32px;
+            max-width: 600px;
           }
         }
         
-        @media (min-width: 1024px) {
+        @media (min-width: 1200px) {
           .paper-card {
-            max-width: 500px;
+            max-width: 650px;
           }
         }
       `}</style>
