@@ -1707,10 +1707,15 @@ export default function Invitation() {
   const detailsRef = useRef(null);
   const { width: viewportWidth } = useWindowSize();
 
-  // Calculate zoom factor: design natural width is 420px.
-  // We want it to fill the screen with some padding on larger displays.
-  // Cap at 3x to avoid pixel blur on huge monitors.
-  const zoomFactor = Math.min(3, Math.max(1, (viewportWidth - 32) / 420));
+  // Design natural width is 420px (phone-card invitation).
+  // On desktop we KEEP it at natural size (centered card, not stretched).
+  // On narrow phones (<436px) we scale DOWN so it fits without horizontal scroll.
+  const DESIGN_WIDTH = 420;
+  const SAFE_PADDING = 16; // px on each side on mobile
+  const zoomFactor =
+    viewportWidth < DESIGN_WIDTH + SAFE_PADDING * 2
+      ? Math.max(0.5, (viewportWidth - SAFE_PADDING * 2) / DESIGN_WIDTH)
+      : 1;
 
   useEffect(() => {
     ensureFonts();
@@ -1736,6 +1741,8 @@ export default function Invitation() {
         minHeight: "100vh",
         background: `linear-gradient(135deg, ${C.tealDeep} 0%, ${C.teal} 50%, ${C.coral} 100%)`,
         fontFamily: "'Fraunces', serif",
+        padding: "24px 0",
+        boxSizing: "border-box",
         color: C.ink,
       }}
     >
@@ -1786,13 +1793,18 @@ export default function Invitation() {
         }
         
         /* === RESPONSIVE STYLES === */
-        /* Design is built for ~420px natural width.
-           We scale it up dynamically via inline style based on viewport width. */
+        /* Design is built for 420px natural width (phone-card invitation).
+           On desktop it stays at 420px and looks like a card centred on the gradient.
+           On narrow phones we scale it DOWN via inline 'zoom' so it fits the viewport. */
         .app-container {
           width: 420px;
           margin: 0 auto;
           background: ${C.paper};
           position: relative;
+          border-radius: 24px;
+          overflow: hidden;
+          box-shadow: 0 30px 80px rgba(0, 0, 0, 0.35),
+                      0 8px 24px rgba(0, 0, 0, 0.18);
         }
       `}</style>
 
