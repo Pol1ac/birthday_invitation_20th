@@ -2,7 +2,10 @@ import React, { useState, useEffect, useRef, useCallback } from "react";
 
 // === RESPONSIVE HOOK ========================================================
 function useWindowSize() {
-  const [size, setSize] = useState({ width: window.innerWidth, height: window.innerHeight });
+  const [size, setSize] = useState({
+    width: typeof window !== "undefined" ? window.innerWidth : 420,
+    height: typeof window !== "undefined" ? window.innerHeight : 800,
+  });
   useEffect(() => {
     const handleResize = () => setSize({ width: window.innerWidth, height: window.innerHeight });
     window.addEventListener("resize", handleResize);
@@ -778,7 +781,7 @@ function DetailRow({ label, value, accent = C.coralDeep, hand = false }) {
 
 function DetailsScreen() {
   return (
-    <PaperBg className="paper-card" style={{ padding: "40px 24px 50px", position: "relative", overflow: "hidden" }}>
+    <PaperBg style={{ padding: "40px 24px 50px", position: "relative", overflow: "hidden" }}>
       {/* Section heading */}
       <FloatingDoodle top={20} right={10} delay={0.4} rotation={12}>
         <Palm size={70} color={C.teal} />
@@ -896,7 +899,6 @@ function DetailsScreen() {
 function DresscodeScreen() {
   return (
     <div
-      className="paper-card"
       style={{
         position: "relative",
         padding: "48px 24px 60px",
@@ -1095,7 +1097,7 @@ function BringScreen() {
     { emoji: "🎶", title: "трек у плейлист", note: "додаси нижче" },
   ];
   return (
-    <PaperBg className="paper-card" style={{ padding: "40px 24px 50px", position: "relative", overflow: "hidden" }}>
+    <PaperBg style={{ padding: "40px 24px 50px", position: "relative", overflow: "hidden" }}>
       <FloatingDoodle top={30} left={10} delay={0.3} rotation={-8}>
         <Cocktail size={60} color={C.coralDeep} />
       </FloatingDoodle>
@@ -1235,7 +1237,6 @@ function BringScreen() {
 function MusicScreen() {
   return (
     <div
-      className="paper-card"
       style={{
         position: "relative",
         padding: "44px 24px 50px",
@@ -1411,7 +1412,7 @@ function RsvpScreen({ onSubmit, status }) {
   };
 
   return (
-    <PaperBg className="paper-card" style={{ padding: "44px 24px 60px", position: "relative", overflow: "hidden" }}>
+    <PaperBg style={{ padding: "44px 24px 60px", position: "relative", overflow: "hidden" }}>
       <FloatingDoodle top={22} left={14} delay={0.1} rotation={-6}>
         <Star size={32} color={C.coralDeep} stroke={3} />
       </FloatingDoodle>
@@ -1704,6 +1705,12 @@ export default function Invitation() {
   const [stage, setStage] = useState("hero"); // hero | full
   const [rsvp, setRsvp] = useState(null);
   const detailsRef = useRef(null);
+  const { width: viewportWidth } = useWindowSize();
+
+  // Calculate zoom factor: design natural width is 420px.
+  // We want it to fill the screen with some padding on larger displays.
+  // Cap at 3x to avoid pixel blur on huge monitors.
+  const zoomFactor = Math.min(3, Math.max(1, (viewportWidth - 32) / 420));
 
   useEffect(() => {
     ensureFonts();
@@ -1727,7 +1734,7 @@ export default function Invitation() {
       style={{
         width: "100%",
         minHeight: "100vh",
-        background: C.paper,
+        background: `linear-gradient(135deg, ${C.tealDeep} 0%, ${C.teal} 50%, ${C.coral} 100%)`,
         fontFamily: "'Fraunces', serif",
         color: C.ink,
       }}
@@ -1779,44 +1786,31 @@ export default function Invitation() {
         }
         
         /* === RESPONSIVE STYLES === */
-        .paper-card {
-          width: 100%;
-          max-width: 100%;
+        /* Design is built for ~420px natural width.
+           We scale it up dynamically via inline style based on viewport width. */
+        .app-container {
+          width: 420px;
           margin: 0 auto;
-        }
-        
-        @media (min-width: 600px) {
-          .paper-card {
-            max-width: 540px;
-          }
-        }
-        
-        @media (min-width: 900px) {
-          .paper-card {
-            max-width: 600px;
-          }
-        }
-        
-        @media (min-width: 1200px) {
-          .paper-card {
-            max-width: 650px;
-          }
+          background: ${C.paper};
+          position: relative;
         }
       `}</style>
 
-      <HeroScreen onContinue={handleContinue} />
+      <div className="app-container" style={{ zoom: zoomFactor }}>
+        <HeroScreen onContinue={handleContinue} />
 
-      {stage === "full" && (
-        <div style={{ animation: "slideUp 0.6s ease" }}>
-          <div ref={detailsRef}>
-            <DetailsScreen />
+        {stage === "full" && (
+          <div style={{ animation: "slideUp 0.6s ease" }}>
+            <div ref={detailsRef}>
+              <DetailsScreen />
+            </div>
+            <DresscodeScreen />
+            <BringScreen />
+            <MusicScreen />
+            <RsvpScreen onSubmit={handleRsvp} status={rsvp} />
           </div>
-          <DresscodeScreen />
-          <BringScreen />
-          <MusicScreen />
-          <RsvpScreen onSubmit={handleRsvp} status={rsvp} />
-        </div>
-      )}
+        )}
+      </div>
     </div>
   );
 }
