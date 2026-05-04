@@ -32,7 +32,7 @@ function ensureFonts() {
 // To collect real RSVPs:
 //  1. Go to https://tally.so and create a free form with these fields:
 //       - "Імʼя" (short text, field name = name)
-//       - "Чи будеш?" (single choice: "буду" / "не зможу", field name = status)
+//       - "Чи ��удеш?" (single choice: "буду" / "не зможу", field name = status)
 //       - (optional) "Повідомлення" (long text, field name = message)
 //  2. Click "Publish", copy the form URL — it will look like https://tally.so/r/abc123
 //  3. Paste it below as TALLY_URL.
@@ -961,7 +961,7 @@ function DresscodeScreen() {
         >
           {[
             { y: "✓", t: "шорти / лляне", k: "так" },
-            { y: "✓", t: "сорочки в квіти", k: "так" },
+            { y: "✓", t: "гавайська сорочка", k: "так" },
             { y: "✓", t: "сонцезахисні окуляри", k: "так" },
             { y: "✓", t: "сандалі / босоніж", k: "так" },
             { y: "✗", t: "костюм-трійка", k: "ну ні" },
